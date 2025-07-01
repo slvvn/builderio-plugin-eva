@@ -1,6 +1,9 @@
-import { registerCommercePlugin, CommerceAPIOperations } from '@builder.io/commerce-plugin-tools';
-import { getDataConfig } from './data-plugin';
-import appState from '@builder.io/app-context';
+import {
+  registerCommercePlugin,
+  CommerceAPIOperations,
+} from "@builder.io/commerce-plugin-tools";
+import { getDataConfig } from "./data-plugin";
+import appState from "@builder.io/app-context";
 
 interface EvaProduct {
   product_id: string;
@@ -27,19 +30,19 @@ interface Resource {
 
 const plugin = registerCommercePlugin(
   {
-    name: 'Eva',
-    id: '@builder.io/plugin-eva',
+    name: "EVA",
+    id: "@builder.io/plugin-eva",
     settings: [
       {
-        name: 'organizationUnitSetID',
-        type: 'string',
-        required: true,
-        helperText: 'Enter your Eva Organization Unit Set ID',
-      }
+        name: "organizationUnitSetID",
+        type: "string",
+        required: false,
+        helperText: "Enter your EVA Organization Unit Set ID",
+      },
     ],
-    ctaText: 'Connect Eva Commerce',
+    ctaText: "Connect EVA",
   },
-  settings => {
+  (settings) => {
     // Basic cache for better UX
     const cache = new Map<string, Resource>();
 
@@ -48,15 +51,15 @@ const plugin = registerCommercePlugin(
     };
 
     const headers = {
-      'Content-Type': 'application/json',
-      'Eva-User-Agent': 'Eva-Builder-Plugin',
-      'Eva-Requested-OrganizationUnitID': settings.get('organizationUnitSetID'),
+      "Content-Type": "application/json",
+      "Eva-User-Agent": "Eva-Builder-Plugin",
+      "Eva-Requested-OrganizationUnitID": settings.get("organizationUnitSetID"),
     };
 
     const searchProducts = async (searchTerm?: string): Promise<Resource[]> => {
       try {
-        const response = await fetch(baseUrl('SearchProducts'), {
-          method: 'POST',
+        const response = await fetch(baseUrl("SearchProducts"), {
+          method: "POST",
           headers,
           body: JSON.stringify({
             ...(searchTerm && { Query: searchTerm }),
@@ -71,23 +74,25 @@ const plugin = registerCommercePlugin(
         }
 
         const data: EvaSearchResponse = await response.json();
-        return data.Products.map(product => ({
+        return data.Products.map((product) => ({
           id: product.product_id,
           handle: product.product_id,
-          title: product.display_value ?? '',
-          image: product.primary_image?.url ? {
-            src: product.primary_image.url
-          } : undefined
+          title: product.display_value ?? "",
+          image: product.primary_image?.url
+            ? {
+                src: product.primary_image.url,
+              }
+            : undefined,
         }));
       } catch (error) {
-        console.error('Error fetching Eva products', error);
+        console.error("Error fetching Eva products", error);
         return [];
       }
     };
 
     const getProductDetail = async (id: string): Promise<Resource> => {
-      const response = await fetch(baseUrl('GetProductDetail'), {
-        method: 'POST',
+      const response = await fetch(baseUrl("GetProductDetail"), {
+        method: "POST",
         headers,
         body: JSON.stringify({ ID: id }),
       });
@@ -101,9 +106,11 @@ const plugin = registerCommercePlugin(
         id: data.Result.product_id,
         handle: data.Result.product_id,
         title: data.Result.display_value,
-        image: data.Result.primary_image?.url ? {
-          src: data.Result.primary_image.url
-        } : undefined
+        image: data.Result.primary_image?.url
+          ? {
+              src: data.Result.primary_image.url,
+            }
+          : undefined,
       };
     };
 
@@ -116,7 +123,7 @@ const plugin = registerCommercePlugin(
           }
 
           const product = await getProductDetail(id);
-          
+
           if (!product) {
             throw new Error(`Product with ID ${id} not found`);
           }
@@ -132,7 +139,7 @@ const plugin = registerCommercePlugin(
           }
 
           const product = await getProductDetail(handle);
-          
+
           if (!product) {
             throw new Error(`Product with ID ${handle} not found`);
           }
@@ -148,31 +155,33 @@ const plugin = registerCommercePlugin(
 
         getRequestObject(id: string) {
           return {
-            '@type': '@builder.io/core:Request' as const,
+            "@type": "@builder.io/core:Request" as const,
             request: {
-              url: baseUrl('GetProductDetail'),
-              method: 'POST',
+              url: baseUrl("GetProductDetail"),
+              method: "POST",
               headers,
               body: JSON.stringify({
                 Filter: {
                   ProductID: id,
                 },
                 PageConfig: {},
-              })
+              }),
             },
             options: {
-              product: id
-            }
+              product: id,
+            },
           };
-        }
-      }
+        },
+      },
     };
 
-    const dataConfig = getDataConfig(service, { organizationUnitSetID: settings.get('organizationUnitSetID') });
+    const dataConfig = getDataConfig(service, {
+      organizationUnitSetID: settings.get("organizationUnitSetID"),
+    });
     appState.registerDataPlugin(dataConfig);
-    
+
     return service;
   }
 );
 
-export default plugin; 
+export default plugin;

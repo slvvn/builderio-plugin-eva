@@ -1,32 +1,29 @@
-import type { ResourceType } from '@builder.io/sdk';
-import { CommerceAPIOperations } from '@builder.io/commerce-plugin-tools';
+import type { ResourceType } from "@builder.io/sdk";
+import { CommerceAPIOperations } from "@builder.io/commerce-plugin-tools";
 
-type EvaResourceType = 'product';
+type EvaResourceType = "product";
 
 interface EvaUrlParams {
   resource: EvaResourceType;
   resourceId?: string;
-  query?: string;
-  limit?: number;
-  headers: {
-    organizationUnitSetID: string;
-    [key: string]: any;
-  };
 }
 
-const buildHeaders = (headers: { organizationUnitSetID: string; [key: string]: any }) => ({
-  'Content-Type': 'application/json',
-  'Eva-User-Agent': 'Eva-Builder-Plugin',
-  'Eva-Requested-Organization-ID': headers.organizationUnitSetID,
+const buildHeaders = (headers: {
+  organizationUnitSetID: string;
+  [key: string]: any;
+}) => ({
+  "Content-Type": "application/json",
+  "Eva-User-Agent": "Eva-Builder-Plugin",
+  "Eva-Requested-Organization-ID": headers.organizationUnitSetID,
 });
 
-function buildEvaUrl({ resource, resourceId, query, limit, headers }: EvaUrlParams): string {
-  const base = 'https://api.newblack.guc.prod.eva-online.global/message';
-  let endpoint = '';
+function buildEvaUrl({ resource, resourceId }: EvaUrlParams): string {
+  const base = "https://api.newblack.guc.prod.eva-online.global/message";
+  let endpoint = "";
 
   switch (resource) {
-    case 'product':
-      endpoint = resourceId ? 'GetProductDetail' : 'SearchProducts';
+    case "product":
+      endpoint = resourceId ? "GetProductDetail" : "SearchProducts";
       break;
     default:
       throw new Error(`Unsupported resource type: ${resource}`);
@@ -41,9 +38,9 @@ const RESOURCE_TYPES: {
   description: string;
 }[] = [
   {
-    name: 'Product',
-    id: 'product',
-    description: 'All of your Eva products.',
+    name: "Product",
+    id: "product",
+    description: "All of your EVA products.",
   },
 ];
 
@@ -51,47 +48,65 @@ interface DataPluginConfig {
   name: string;
   icon: string;
   getResourceTypes: () => Promise<ResourceType[]>;
-  getEntriesByResourceType: (resourceTypeId: string, options: any) => Promise<Array<{ id: string; name: string }>>;
+  getEntriesByResourceType: (
+    resourceTypeId: string,
+    options: any
+  ) => Promise<Array<{ id: string; name: string }>>;
 }
 
-export const getDataConfig = (service: CommerceAPIOperations, headers: any): DataPluginConfig => {
+export const getDataConfig = (
+  service: CommerceAPIOperations,
+  headers: any
+): DataPluginConfig => {
   return {
-    name: 'EVA',
-    icon: 'https://avatars.githubusercontent.com/u/14044098?s=200&v=4',
+    name: "EVA",
+    icon: "https://avatars.githubusercontent.com/u/14044098?s=200&v=4",
     getResourceTypes: async () =>
       RESOURCE_TYPES.map(
         (model): ResourceType => ({
           ...model,
+          entryInputs: () => [
+            {
+              friendlyName: "Search",
+              name: "query",
+              type: "string",
+            },
+          ],
           inputs: () => [
             {
-              friendlyName: 'limit',
-              name: 'limit',
-              type: 'number',
+              friendlyName: "limit",
+              name: "limit",
+              type: "number",
               defaultValue: 10,
               max: 100,
               min: 1,
             },
             {
-              friendlyName: 'Search',
-              name: 'query',
-              type: 'string',
+              friendlyName: "Search",
+              name: "query",
+              type: "string",
             },
           ],
 
-          toUrl: ({ entry, query, limit }: { entry?: string; query?: string; limit?: number }) => {
+          toUrl: ({
+            entry,
+            query,
+            limit,
+          }: {
+            entry?: string;
+            query?: string;
+            limit?: number;
+          }) => {
             const url = buildEvaUrl({
-              query,
-              limit,
               resource: model.id,
               resourceId: entry,
-              headers,
             });
 
             return {
-              '@type': '@builder.io/core:Request',
+              "@type": "@builder.io/core:Request",
               request: {
                 url,
-                method: 'POST',
+                method: "POST",
                 headers: buildHeaders(headers),
                 body: JSON.stringify(
                   entry
@@ -99,7 +114,7 @@ export const getDataConfig = (service: CommerceAPIOperations, headers: any): Dat
                         ID: entry,
                       }
                     : {
-                      ...(query && { Query: query }),
+                        ...(query && { Query: query }),
                         PageConfig: {
                           ...(limit && { PageSize: limit }),
                         },
@@ -124,8 +139,10 @@ export const getDataConfig = (service: CommerceAPIOperations, headers: any): Dat
         ];
       }
 
-      const response = await service[resourceTypeId].search(options.searchText || '');
-      return response.map(result => ({
+      const response = await service[resourceTypeId].search(
+        options.searchText || ""
+      );
+      return response.map((result) => ({
         id: String(result.id),
         name: result.title,
       }));

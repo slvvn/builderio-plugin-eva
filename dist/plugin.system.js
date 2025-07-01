@@ -33185,7 +33185,7 @@ System.register(['@builder.io/react', '@emotion/core', '@material-ui/core', 'rea
         "Eva-User-Agent": "Eva-Builder-Plugin",
         "Eva-Requested-Organization-ID": headers.organizationUnitSetID
       });
-      function buildEvaUrl({ resource, resourceId, query, limit, headers }) {
+      function buildEvaUrl({ resource, resourceId }) {
         const base = "https://api.newblack.guc.prod.eva-online.global/message";
         let endpoint = "";
         switch (resource) {
@@ -33201,7 +33201,7 @@ System.register(['@builder.io/react', '@emotion/core', '@material-ui/core', 'rea
         {
           name: "Product",
           id: "product",
-          description: "All of your Eva products."
+          description: "All of your EVA products."
         }
       ];
       const getDataConfig = (service, headers) => {
@@ -33210,6 +33210,13 @@ System.register(['@builder.io/react', '@emotion/core', '@material-ui/core', 'rea
           icon: "https://avatars.githubusercontent.com/u/14044098?s=200&v=4",
           getResourceTypes: async () => RESOURCE_TYPES.map((model) => ({
             ...model,
+            entryInputs: () => [
+              {
+                friendlyName: "Search",
+                name: "query",
+                type: "string"
+              }
+            ],
             inputs: () => [
               {
                 friendlyName: "limit",
@@ -33225,13 +33232,14 @@ System.register(['@builder.io/react', '@emotion/core', '@material-ui/core', 'rea
                 type: "string"
               }
             ],
-            toUrl: ({ entry, query, limit }) => {
+            toUrl: ({
+              entry,
+              query,
+              limit
+            }) => {
               const url = buildEvaUrl({
-                query,
-                limit,
                 resource: model.id,
-                resourceId: entry,
-                headers
+                resourceId: entry
               });
               return {
                 "@type": "@builder.io/core:Request",
@@ -33273,17 +33281,17 @@ System.register(['@builder.io/react', '@emotion/core', '@material-ui/core', 'rea
       };
 
       const plugin = exports('default', registerCommercePlugin({
-        name: "Eva",
+        name: "EVA",
         id: "@builder.io/plugin-eva",
         settings: [
           {
             name: "organizationUnitSetID",
             type: "string",
-            required: true,
-            helperText: "Enter your Eva Organization Unit Set ID"
+            required: false,
+            helperText: "Enter your EVA Organization Unit Set ID"
           }
         ],
-        ctaText: "Connect Eva Commerce"
+        ctaText: "Connect EVA"
       }, (settings) => {
         const cache = new Map();
         const baseUrl = (endpoint) => {
@@ -33393,7 +33401,9 @@ System.register(['@builder.io/react', '@emotion/core', '@material-ui/core', 'rea
             }
           }
         };
-        const dataConfig = getDataConfig(service, { organizationUnitSetID: settings.get("organizationUnitSetID") });
+        const dataConfig = getDataConfig(service, {
+          organizationUnitSetID: settings.get("organizationUnitSetID")
+        });
         appState.registerDataPlugin(dataConfig);
         return service;
       }));
