@@ -56,8 +56,8 @@ interface DataPluginConfig {
 
 export const getDataConfig = (service: CommerceAPIOperations, headers: any): DataPluginConfig => {
   return {
-    name: 'Eva Commerce',
-    icon: 'https://example.com/eva-logo.png', // TODO: Replace with actual Eva logo URL
+    name: 'EVA',
+    icon: 'https://avatars.githubusercontent.com/u/14044098?s=200&v=4',
     getResourceTypes: async () =>
       RESOURCE_TYPES.map(
         (model): ResourceType => ({
@@ -87,7 +87,6 @@ export const getDataConfig = (service: CommerceAPIOperations, headers: any): Dat
               headers,
             });
 
-            // Return a Builder.io Request object
             return {
               '@type': '@builder.io/core:Request',
               request: {
@@ -100,9 +99,7 @@ export const getDataConfig = (service: CommerceAPIOperations, headers: any): Dat
                         ID: entry,
                       }
                     : {
-                        Filter: {
-                          ...(query && { SearchTerm: query }),
-                        },
+                      ...(query && { Query: query }),
                         PageConfig: {
                           ...(limit && { PageSize: limit }),
                         },
@@ -115,7 +112,6 @@ export const getDataConfig = (service: CommerceAPIOperations, headers: any): Dat
         })
       ),
     getEntriesByResourceType: async (resourceTypeId, options = {}) => {
-      // Fetch entries from Eva using the provided service
       const entry = options.resourceEntryId;
       if (entry) {
         const entryObj = await service[resourceTypeId].findById(entry);

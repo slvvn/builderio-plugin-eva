@@ -33206,8 +33206,8 @@ System.register(['@builder.io/react', '@emotion/core', '@material-ui/core', 'rea
       ];
       const getDataConfig = (service, headers) => {
         return {
-          name: "Eva Commerce",
-          icon: "https://example.com/eva-logo.png",
+          name: "EVA",
+          icon: "https://avatars.githubusercontent.com/u/14044098?s=200&v=4",
           getResourceTypes: async () => RESOURCE_TYPES.map((model) => ({
             ...model,
             inputs: () => [
@@ -33242,9 +33242,7 @@ System.register(['@builder.io/react', '@emotion/core', '@material-ui/core', 'rea
                   body: JSON.stringify(entry ? {
                     ID: entry
                   } : {
-                    Filter: {
-                      ...query && { SearchTerm: query }
-                    },
+                    ...query && { Query: query },
                     PageConfig: {
                       ...limit && { PageSize: limit }
                     }
