@@ -65,13 +65,6 @@ export const getDataConfig = (
       RESOURCE_TYPES.map(
         (model): ResourceType => ({
           ...model,
-          entryInputs: () => [
-            {
-              friendlyName: "Search",
-              name: "query",
-              type: "string",
-            },
-          ],
           inputs: () => [
             {
               friendlyName: "limit",
@@ -115,9 +108,7 @@ export const getDataConfig = (
                       }
                     : {
                         ...(query && { Query: query }),
-                        PageConfig: {
-                          ...(limit && { PageSize: limit }),
-                        },
+                        ...(limit && { PageSize: limit }),
                       }
                 ),
               },

@@ -63,9 +63,7 @@ const plugin = registerCommercePlugin(
           headers,
           body: JSON.stringify({
             ...(searchTerm && { Query: searchTerm }),
-            PageConfig: {
-              PageSize: 20,
-            },
+            PageSize: 20,
           }),
         });
 

@@ -33210,13 +33210,6 @@ System.register(['@builder.io/react', '@emotion/core', '@material-ui/core', 'rea
           icon: "https://avatars.githubusercontent.com/u/14044098?s=200&v=4",
           getResourceTypes: async () => RESOURCE_TYPES.map((model) => ({
             ...model,
-            entryInputs: () => [
-              {
-                friendlyName: "Search",
-                name: "query",
-                type: "string"
-              }
-            ],
             inputs: () => [
               {
                 friendlyName: "limit",
@@ -33251,9 +33244,7 @@ System.register(['@builder.io/react', '@emotion/core', '@material-ui/core', 'rea
                     ID: entry
                   } : {
                     ...query && { Query: query },
-                    PageConfig: {
-                      ...limit && { PageSize: limit }
-                    }
+                    ...limit && { PageSize: limit }
                   })
                 }
               };
@@ -33309,9 +33300,7 @@ System.register(['@builder.io/react', '@emotion/core', '@material-ui/core', 'rea
               headers,
               body: JSON.stringify({
                 ...searchTerm && { Query: searchTerm },
-                PageConfig: {
-                  PageSize: 20
-                }
+                PageSize: 20
               })
             });
             if (!response.ok) {
